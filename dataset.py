@@ -41,12 +41,12 @@ def padding_sequence(seq, sequence_length):
     new_seq[sequence_length - len(seq):] = seq
     return new_seq
 
-
+# given params this function gives back the parameter it is asked for
 def return_variables(params):
     window_input = params['window_input']
     window_output = params['window_output']
     offset = params['offset']
-    verbose = params['verbose']
+    verbose = params['verbose'] # par to print?
     store_path = params['store_path']  # store_path is used to save data
     min_count = params['min_count']
     sigma = params['sigma']
@@ -110,6 +110,7 @@ def create_params_list(data_path, params, verbose=True):
 
 # PHASE 1
 
+# this function generates a dataset taking as input data in csv format and parameters (machine number, offset,...)
 # current_offset must be an integer and it must indicate minutes
 def generate_dataset_by_serial_offset(data, params, current_offset):
     data["current_offset"] = current_offset
@@ -153,16 +154,21 @@ def generate_dataset_by_serial_offset(data, params, current_offset):
                 (data["bin_output"].isin(periods_id))]
     return data
 
-
+## generate a dataset for given serial number paassing both params and data for the specific machine
 def generate_dataset_by_serial(data, params):
+    # get window size (input), offset, verbose flag, store path and other par from arg params
     window_input, _, offset, verbose, store_path, _, _ = return_variables(
         params)
+    # get serial number from data
     serial = data["serial"][0]
+    # print machine id if verbose is true
     if verbose:
         print("serial: ", serial)
-    data = data.sort_index()  # sort by index
+    # sort data by index
+    data = data.sort_index()
     offsets = list(range(0, window_input, offset))
     offset_data = []
+    # generate dataset for each current offset and stores it in list offset_data
     for current_offset in offsets:
         df_offset = generate_dataset_by_serial_offset(data.copy(),
                                                       params,
@@ -171,12 +177,15 @@ def generate_dataset_by_serial(data, params):
     dataset = pd.concat(offset_data)
     if verbose:
         print("{} has shape: {}".format(str(serial) + ".csv", dataset.shape))
+    # save the dataset to a csv file
     filepath = os.path.join(store_path, str(serial) + ".csv")
     dataset.to_csv(filepath)
 
-
+# function that invokes subfunctions to generate a dataset for each machine (serial)
 def generate_dataset(data, params):
+    # data grouped by serial number -> returns a groupby object that contains information about the groups 
     grouped_data = data.groupby('serial')
+    # dataset generated for each group
     for _, data_serial in grouped_data:
         generate_dataset_by_serial(data_serial, params)
     return
