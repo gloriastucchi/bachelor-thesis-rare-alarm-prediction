@@ -274,6 +274,7 @@ def create_final_dataset(params, serials, offsets, sequence_input_length, sequen
     padding_mode = "after"
     if "padding_mode" in params:
         padding_mode = params["padding_mode"]
+    # vengono create quattro liste vuote che verranno utilizzate per memo dati di i/o per creare dataset finale
     X_train_tot = []
     X_test_tot = []
     Y_train_tot = []
@@ -287,6 +288,7 @@ def create_final_dataset(params, serials, offsets, sequence_input_length, sequen
     tot_combo = len(serials) * len(offsets)
     combos = [(serial, offset) for serial in serials for offset in offsets]
     stratify = []
+    # iterazione tra tutte combo di serial e offset
     for serial in serials:
         for offset in offsets:
             sentinel += 1
@@ -300,6 +302,9 @@ def create_final_dataset(params, serials, offsets, sequence_input_length, sequen
                 file_path = os.path.join(store_path, filename)
                 with open(file_path, 'rb') as f:
                     seqences = pickle.load(f)
+                    # Se sono stati specificati degli allarmi da rimuovere o da considerare come rilevanti, 
+                    # la funzione rimuove o conserva solo gli allarmi appropriati per ciascuna sequenza di 
+                    # input e di output.
                     if removal_alarms != None and len(removal_alarms) > 0:
                         X = [[alarm for alarm in seq_x if (
                             alarm not in removal_alarms and alarm != 0)] for seq_x, seq_y in seqences]
@@ -313,9 +318,13 @@ def create_final_dataset(params, serials, offsets, sequence_input_length, sequen
                         Y = [seq_y for seq_x, seq_y in seqences]
 
                     # pruning
+                    # Applica una funzione di potatura (prune_series()) a ciascuna sequenza di input e di output, che rimuove 
+                    # eventuali valori nulli o non rilevanti.
                     X = [prune_series(seq_x) for seq_x in X]
                     Y = [prune_series(seq_y) for seq_y in Y]
 
+                    # Salva le sequenze di input e di output in due liste separate (list_X e list_Y), e tiene traccia delle 
+                    # lunghezze delle sequenze originali in due liste separate (lengths_X e lengths_Y).
                     list_X.append(X)
                     list_Y.append(Y)
                     lengths_X += [len(seq_x) for seq_x in X]
@@ -324,6 +333,9 @@ def create_final_dataset(params, serials, offsets, sequence_input_length, sequen
     # length of sequences in input and output is calculated
     lengths_X = np.asarray(lengths_X)
     lengths_Y = np.asarray(lengths_Y)
+    # Calcola la lunghezza media delle sequenze di input, e calcola una lunghezza di sequenza di input 
+    # finale come la media più una deviazione standard moltiplicata da un parametro sigma. La lunghezza 
+    # di sequenza di output finale è invece impostata come la lunghezza massima delle sequenze di output originali.
     mu_sequence_input_length = lengths_X.mean()
     std_sequence_input_length = lengths_X.std()
     sequence_input_length = int(
