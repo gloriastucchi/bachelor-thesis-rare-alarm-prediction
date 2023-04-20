@@ -110,7 +110,7 @@ def create_params_list(data_path, params, verbose=True):
 
 # PHASE 1
 
-# this function generates a dataset taking as input data in csv format and parameters (machine number, offset,...)
+# this function generates a dataset taking as input data in csv format and parameters (machine number, ...) and the current offset
 # current_offset must be an integer and it must indicate minutes
 def generate_dataset_by_serial_offset(data, params, current_offset):
     data["current_offset"] = current_offset
@@ -194,36 +194,53 @@ def generate_dataset(data, params):
 # PHASE 2
 
 def prune_dataset(params):
+    # inizialize serial list
     _, _, _, _, store_path, _, _ = return_variables(params)
     serials = []
+
+    # for all the files in the store path dir 
     for f in os.listdir(store_path):
+        # if it finds a CSV file it extracts the serial number
         if f.endswith(".csv"):
             serials.append(int(f.replace(".csv", "")))
-
+    # for each serial number in the serial (each CSV) list generated above read the CSV file and invoke prune_df to obtain sequences 
+    # informative to train the NN
     for serial in serials:
         df = pd.read_csv(os.path.join(store_path, str(serial) + ".csv"))
         offsets = prune_df(df, serial, params)
+    # returns the list of serial numbers and the offsets for each serial
     return serials, offsets
 
 
 def prune_df(df, serial_id, params):
+    # extract parameters from params
     _, _, offset, verbose, store_path, min_count, _ = return_variables(
         params)
 
+    # get all unique offsets in the dataframe
+    # estrae i valori unique dalla colonna current offset dal dataframe df e li assegna alla variabile offset
     offsets = df["current_offset"].unique()
+    # loop through each unique offset in the dataframe
     for offset in offsets:
+        # get sub dataframe for the current offset
+        # sub_df rappresenta il sottoins di dati nel dataframe che ha lo stesso valore di current_offset
         sub_df = df[df["current_offset"] == offset]
+        # print serial number and offset
         if verbose:
             print("serial: {} offset: {}".format(serial_id, offset))
 
+        # group the sub dataframe by binary i/o columns
         groups_input = sub_df.groupby("bin_input")
         groups_output = sub_df.groupby("bin_output")
 
+        # get all unique binary i/o values
         unique1 = sub_df["bin_input"].unique()
         unique2 = sub_df["bin_output"].unique()
+        # intersection of unique i and o values
         periods_id = list(set(unique1).intersection(set(unique2)) - set([-1]))
         periods_id.sort()  # temporal sorting
 
+        # create a dictionary of binary i values to the corresponding alarm values for each period ID 
         diz_input = {bin_id: group.alarm.sort_index(
         ).values for bin_id, group in groups_input if bin_id in periods_id}
         diz_output = {bin_id: group.alarm.sort_index(
@@ -232,7 +249,6 @@ def prune_df(df, serial_id, params):
         # list of [seq_x,seq_y]
         X_Y_offset = [[diz_input[bin_id], diz_output[bin_id]]
                       for bin_id in periods_id]
-
         # apply min_count: remove sequences with count<min_count
         X_Y_offset = [seq for seq in X_Y_offset if len(
             seq[0]) >= min_count and len(seq[1]) >= min_count]
