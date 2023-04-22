@@ -160,7 +160,7 @@ def generate_dataset_by_serial(data, params):
     window_input, _, offset, verbose, store_path, _, _ = return_variables(
         params)
     # get serial number from data
-    serial = data["serial"][0]
+    serial = data['serial'].iloc[0]
     # print machine id if verbose is true
     if verbose:
         print("serial: ", serial)
@@ -187,6 +187,7 @@ def generate_dataset(data, params):
     grouped_data = data.groupby('serial')
     # dataset generated for each group
     for _, data_serial in grouped_data:
+        # passa per ogni seriale la lista (righe del csv) degli allarmi che appartengono a quel macchinario
         generate_dataset_by_serial(data_serial, params)
     return
 

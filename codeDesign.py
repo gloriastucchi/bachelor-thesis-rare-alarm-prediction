@@ -35,7 +35,7 @@ if __name__ == "__main__":
         dtype= dtypes,
         delimiter= ','
     )
-    print(df)
+    print(type(df))
     #create_datasets(params_list, start_point=0)
     #several combinations of parameters are created, each combination can be considered as a new dataset
     #params_list = dsa.create_params_list(data_path="", params=my_params, verbose=True)
