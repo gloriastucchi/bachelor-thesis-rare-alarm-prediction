@@ -110,16 +110,17 @@ def create_params_list(data_path, params, verbose=True):
 
 # PHASE 1
 
-# this function generates a dataset taking as input data in csv format and parameters (machine number, ...) and the current offset
-# current_offset must be an integer and it must indicate minutes
+# this function generates a dataset taking as input data in csv format and parameters 
 def generate_dataset_by_serial_offset(data, params, current_offset):
     data["current_offset"] = current_offset
-    current_offset = datetime.timedelta(minutes=current_offset)
+    #current_offset = pd.Timedelta(minutes=current_offset)
     window_input, window_output, _, _, _, _, _ = return_variables(
         params)
 
+    #min_timestamp = pd.Timestamp(data.index.min())
     min_timestamp = data.index.min()
     min_timestamp += current_offset
+    #max_timestamp = pd.Timestamp(data.index.max())
     max_timestamp = data.index.max()
 
     # create date range for input
