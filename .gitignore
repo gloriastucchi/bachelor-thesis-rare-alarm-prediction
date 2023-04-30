@@ -1,0 +1,6 @@
+*.pyc
+*.npz
+*.pickle
+*.config
+__pycache__/*.*
+processed/*.*

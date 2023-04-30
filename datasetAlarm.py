@@ -459,7 +459,7 @@ def create_datasets(data, params_list, start_point=0, file_tag='all_alarms'):
         #create datasets
         create_datasets(params_list, start_point=0)
     """
-
+    '''
     windows_input=[480,960,240]
     windows_output=[240]
     min_counts=[3]
@@ -474,10 +474,10 @@ def create_datasets(data, params_list, start_point=0, file_tag='all_alarms'):
     my_params['offsets']=[230]
     my_params['verbose']=True
     #several combinations of parameters are created, each combination can be considered as a new dataset
-    params_list = create_params_list('C:/Users/stucc/OneDrive/Desktop/Thesis/bachelor-thesis-rare-alarm-prediction' , my_params)
+    params_list = create_params_list('' , my_params)
     #removal_alarms = [] <- use it only if you want remove some alarms in input
     #relevance_alarms =  [] <- only if you want to keep a subset of alrams in output
-    
+    '''
 
     for params in params_list:
         print('-- run ', params)
