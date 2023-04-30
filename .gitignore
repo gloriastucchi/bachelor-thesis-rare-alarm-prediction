@@ -1,0 +1,8 @@
+# py cached python compilati
+*.pyc
+__pychache__/*.*
+# quelli che genera: aggiungere json poi
+*.npz
+*.pickle
+*.config
+processed/*.*
