@@ -21,7 +21,7 @@ if __name__ == "__main__":
     #names = ["timestamp", "alarm", "serial"]
     #data = pd.read_csv(filename, names=names)
     #print(data.shape)
-    params = []
+    #params = []
     '''
     df = pd.read_csv(
         "groupby-data/legislators-historical.csv",
