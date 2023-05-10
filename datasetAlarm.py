@@ -117,7 +117,7 @@ def generate_dataset_by_serial_offset(data, params, current_offset):
     current_offset = datetime.timedelta(minutes=current_offset)
     window_input, window_output, _, _, _, _, _ = return_variables(
         params)
-    print(data)
+    #print(data)
     min_timestamp = data.index.min()
     min_timestamp += current_offset
     max_timestamp = data.index.max()
@@ -126,7 +126,7 @@ def generate_dataset_by_serial_offset(data, params, current_offset):
     date_range = pd.date_range(
         start=min_timestamp, end=max_timestamp, freq=str(window_input) + "min")
     date_range = [d for d in date_range]
-    print(date_range)
+    #print(date_range)
 
     # create date range for output
     delta_in = datetime.timedelta(minutes=window_input)
@@ -134,7 +134,7 @@ def generate_dataset_by_serial_offset(data, params, current_offset):
     date_range_output = [(d + delta_in, d + delta_in + delta_out)
                          for d in date_range]  # ranges of outputs
     date_range_output = np.asarray(date_range_output).reshape(1, -1)[0]
-    print(date_range_output)
+    #print(date_range_output)
     # create samples
     series = pd.Series(data.index).apply(
         lambda target: return_index(date_range, target))
