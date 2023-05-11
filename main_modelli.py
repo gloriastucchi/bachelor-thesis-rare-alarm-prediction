@@ -42,13 +42,12 @@ Tx = 109 #length of input sequence
 alarm_num_in = 154  
 alarm_num_out = 556  
 
-#extract xtrain ytrain ...
+#eload data from json produced in 
 with open('./processed/MACHINE_TYPE_00_alarms_window_input_1720_window_output_480_offset_60_min_count_20_sigma_3/all_alarms.json', 'rb') as f:
     data = json.load(f)
 #print(type(data))
+#plt.hist(data, bins=10)
 
-
-plt.hist(data, bins=10)
 # Assume data is a list of dictionaries
 all_x_train = []  # Initialize list to hold all x_train values
 for sample_data in data.values():
@@ -78,25 +77,24 @@ for sample_data in data.values():
             all_y_test.append(value)
 
 
-
+#create the model with TRM
 model = TRM(Tx, alarm_num_in, alarm_num_out, hparams)
 
+#define parameters to be passed to the loss function
 alpha = 0.8
 gamma = 2.0
 
+#model is compiled
 model.compile(optimizer=tf.keras.optimizers.Adam(learning_rate=0.001), loss=get_WFL(alpha, gamma))
 
 # define TensorBoard callback
 tensorboard_callback = tf.keras.callbacks.TensorBoard(log_dir='./logs', histogram_freq=1)
 
-
+#calculate predictions
 predictions = model.predict(all_x_train)
 #print(all_y_train.shape)
 #print(predictions.shape)
-'''
-for key, value in data.items():
-    if key == 'x_train':
-        x_train.append(value)
-'''
-# train the model with callback
+
+
+# train the model (loss obtained close to 3.5)
 model.fit(all_x_train, all_y_train, epochs=100, validation_data=(all_x_test, all_y_test), callbacks=[tensorboard_callback])
