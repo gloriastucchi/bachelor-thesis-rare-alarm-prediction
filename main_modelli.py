@@ -40,9 +40,9 @@ hparams = {
         }
 Tx = 109 #length of input sequence
 alarm_num_in = 154  
-alarm_num_out = 556  
+alarm_num_out = 556  # ! numero totaale di possibili allarmi, prima erano 10 e dava errore di non match of dimensions
 
-#eload data from json produced in 
+#eload data from json produced in previous code
 with open('./processed/MACHINE_TYPE_00_alarms_window_input_1720_window_output_480_offset_60_min_count_20_sigma_3/all_alarms.json', 'rb') as f:
     data = json.load(f)
 #print(type(data))
@@ -98,3 +98,7 @@ predictions = model.predict(all_x_train)
 
 # train the model (loss obtained close to 3.5)
 model.fit(all_x_train, all_y_train, epochs=100, validation_data=(all_x_test, all_y_test), callbacks=[tensorboard_callback])
+
+model.save('./Users/stucc/tn/bachelor-thesis-rare-alarm-prediction/model')
+# Load the saved model
+loaded_model = keras.models.load_model('path_to_saved_model')
