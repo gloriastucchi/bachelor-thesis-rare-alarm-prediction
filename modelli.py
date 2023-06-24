@@ -110,7 +110,7 @@ class TokenAndPositionEmbedding(layers.Layer):
 
 
 
-def TRM(Tx, alarm_num_in, alarm_num_out=None, hparams=None):
+def TRM(Tx, alarm_num_in, alarm_num_out, hparams=None):
     """
     Returns the model with transformer-based architecture
     Args:
@@ -177,6 +177,8 @@ def TRM(Tx, alarm_num_in, alarm_num_out=None, hparams=None):
     x = layers.BatchNormalization()(x) 
     x = layers.Dense(nn_dim, activation=activation)(x)
     x = layers.Dropout(dropout)(x)
-    x = layers.BatchNormalization()(x) 
-    outputs = layers.Dense(alarm_num_out, activation="softmax")(x)
+    x = layers.BatchNormalization()(x)
+    output_units = 154  # Number of units in the output layer
+    #! impongo sia 154, prima era alarms_num_output
+    outputs = layers.Dense(output_units, activation="softmax")(x)
     return keras.Model(inputs=inputs, outputs=outputs)

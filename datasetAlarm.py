@@ -341,6 +341,7 @@ def create_final_dataset(params, serials, offsets, sequence_input_length, sequen
     std_sequence_input_length = lengths_X.std()
     sequence_input_length = int(
         mu_sequence_input_length + sigma * std_sequence_input_length) + 1
+    # ! cambiare la dimensione di padding a 154
     sequence_output_length = np.max(lengths_Y)
     sentinel = 0
     # it is iterated on all combinations of serials and offsets

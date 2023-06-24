@@ -22,11 +22,12 @@ def get_WFL(alpha, gamma):
         gamma = 2.0
         loss_function = get_WFL(alpha, gamma)
     """
+    # aggiunto + EPS così non fa log 0
     def WFL(y_true, y_pred):
         y_true, y_pred = cast_labels(y_true, y_pred)
-        loss = -alpha * tf.math.pow(1 - y_pred, gamma) * \
-            y_true * tf.math.log(y_pred) - \
-            (1 - alpha) * tf.math.pow(1 - (1 - y_pred), gamma) * \
-            (1 - y_true) * tf.math.log(1 - y_pred)
+        loss = -alpha * tf.math.pow(1 - y_pred + EPS, gamma) * \
+            y_true * tf.math.log(y_pred + EPS) - \
+            (1 - alpha) * tf.math.pow(1 - (1 - y_pred + EPS), gamma) * \
+            (1 - y_true) * tf.math.log(1 - y_pred + EPS)
         return loss
     return WFL
